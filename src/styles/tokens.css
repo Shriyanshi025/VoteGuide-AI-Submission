@@ -1,0 +1,59 @@
+:root {
+  /* HSL-based Color Palette - Premium & Accessible */
+  --primary-h: 220;
+  --primary-s: 70%;
+  --primary-l: 50%;
+  --primary: hsl(var(--primary-h), var(--primary-s), var(--primary-l));
+  --primary-dark: hsl(var(--primary-h), var(--primary-s), 40%);
+  --primary-light: hsl(var(--primary-h), var(--primary-s), 90%);
+
+  --secondary-h: 160;
+  --secondary-s: 60%;
+  --secondary-l: 45%;
+  --secondary: hsl(var(--secondary-h), var(--secondary-s), var(--secondary-l));
+
+  --accent: hsl(35, 100%, 50%); /* Election Orange */
+  
+  --bg-main: hsl(220, 20%, 98%);
+  --bg-card: hsl(0, 0%, 100%);
+  --text-main: hsl(220, 20%, 15%);
+  --text-muted: hsl(220, 10%, 45%);
+  --border: hsl(220, 15%, 90%);
+
+  /* Spacing Tokens */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+
+  /* Font Scaling Variables */
+  --font-base: 16px;
+  --font-scale: 1; /* Multiplier for accessibility */
+  
+  --h1: calc(2rem * var(--font-scale));
+  --h2: calc(1.5rem * var(--font-scale));
+  --body: calc(1rem * var(--font-scale));
+  --small: calc(0.875rem * var(--font-scale));
+
+  /* Elevation */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+  
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease;
+
+  /* Layout */
+  --header-height: 60px;
+  --nav-height: 70px;
+}
+
+[data-theme='dark'] {
+  --bg-main: hsl(220, 25%, 10%);
+  --bg-card: hsl(220, 25%, 15%);
+  --text-main: hsl(220, 10%, 95%);
+  --text-muted: hsl(220, 10%, 70%);
+  --border: hsl(220, 20%, 20%);
+  --primary-light: hsl(var(--primary-h), var(--primary-s), 20%);
+}

@@ -1,0 +1,140 @@
+{
+  "version": "1.2.0",
+  "lastUpdated": "2026-04-26",
+  "schema": {
+    "roadmap": {
+      "eligibility": {
+        "title": "Voter Eligibility",
+        "rules": [
+          "Must be an Indian Citizen.",
+          "Must be 18 years or older as of Jan 1st of the election year.",
+          "Must be a resident of the polling area."
+        ],
+        "documents": ["Aadhaar", "Passport", "Birth Certificate"],
+        "source": "ECI Handbook 2024, Chapter 2"
+      },
+      "registration": {
+        "title": "Registration Process",
+        "rules": [
+          "Fill Form 6 for new registration.",
+          "Submit online via Voters Portal or offline to BLO."
+        ],
+        "documents": ["Address Proof", "Age Proof", "Photograph"],
+        "portal": "voters.eci.gov.in",
+        "source": "ECI Registration Guidelines"
+      },
+      "verification": {
+        "title": "Electoral Roll Verification",
+        "rules": [
+          "Check name in Voter List.",
+          "Ensure EPIC number matches details."
+        ],
+        "documents": ["EPIC (Voter ID)"],
+        "action": "Search via NVSP Portal",
+        "source": "ECI Electoral Roll FAQ"
+      },
+      "booth": {
+        "title": "Polling Booth Identification",
+        "rules": [
+          "Find your Part Number and Serial Number.",
+          "Locate your specific Polling Station."
+        ],
+        "documents": ["Voter Information Slip"],
+        "source": "ECI Booth Finder Manual"
+      },
+      "documents": {
+        "title": "Approved Identification Documents",
+        "rules": [
+          "Carry your Voter ID (EPIC) if available.",
+          "If EPIC is not available, you can use any of these approved alternatives:",
+          "Aadhaar Card",
+          "Passport",
+          "Driving License",
+          "PAN Card",
+          "MNREGA Job Card",
+          "Bank/Post Office photo passbook",
+          "Pension document with photo",
+          "Service ID card (Central/State/PSU)",
+          "Labour smart card",
+          "Health insurance smart card",
+          "Official MP/MLA/MLC ID",
+          "UDID card (for PwD)"
+        ],
+        "documents": ["EPIC", "Aadhaar", "Passport", "PAN", "DL"],
+        "source": "ECI Order No. 3/4/ID/2024"
+      },
+      "vote": {
+        "title": "The Voting Process",
+        "rules": [
+          "First Officer checks name.",
+          "Second Officer inks finger and takes signature.",
+          "Third Officer enables EVM.",
+          "Press button on EVM and check VVPAT slip."
+        ],
+        "documents": [],
+        "source": "ECI Voter Guide 2024"
+      },
+      "results": {
+        "title": "Election Results",
+        "rules": [
+          "Counting happens on scheduled date.",
+          "Live results available on results.eci.gov.in"
+        ],
+        "documents": [],
+        "source": "ECI Results Portal"
+      },
+      "submit_documents": {
+        "title": "Document Submission & Updates",
+        "rules": [
+          "Online Submission Methods:",
+          "Submit online via the official NVSP portal (voters.eci.gov.in).",
+          "Use the Voter Helpline mobile app for easy uploads.",
+          "Offline Submission Methods:",
+          "Visit your local Booth Level Officer (BLO) for offline submission.",
+          "Visit the Electoral Registration Officer (ERO) office in your area.",
+          "Required Preparation:",
+          "Ensure you have accepted proofs for age and address ready."
+        ],
+        "documents": ["Aadhaar", "Passport", "Birth Certificate", "Electricity Bill"],
+        "source": "ECI Registration Manual Section 4.2"
+      }
+    },
+    "documents": {
+      "id_proofs": [
+        "Aadhaar Card",
+        "Passport",
+        "Driving License",
+        "PAN Card",
+        "MNREGA Job Card",
+        "Bank/Post Office photo passbook",
+        "Pension document with photo",
+        "Service ID card",
+        "Labour smart card",
+        "Health insurance smart card",
+        "Official MP/MLA/MLC ID",
+        "UDID card"
+      ],
+      "source": "ECI Identification Rules"
+    },
+    "faqs": [
+      {
+        "q": "Can I vote if my name is not in the voter list but I have a Voter ID?",
+        "a": "No, your name must be present in the electoral roll to cast a vote.",
+        "source": "ECI FAQ #12"
+      }
+    ],
+    "common_misconceptions": [
+      {
+        "myth": "I need my Voter ID card to vote.",
+        "fact": "If your name is in the list, you can use any of the 12 approved IDs like Aadhaar.",
+        "source": "ECI Awareness Bulletin"
+      }
+    ],
+    "quick_checks": [
+      "Is your name in the voter list?",
+      "Do you have a valid ID?",
+      "Do you know your polling booth?"
+    ],
+    "supported_languages": ["English", "Hindi", "Marathi", "Tamil", "Bengali"]
+  }
+}
