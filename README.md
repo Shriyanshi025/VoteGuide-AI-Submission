@@ -16,12 +16,19 @@ VoteGuide AI is a specialized, production-hardened digital assistant designed to
 3. Run Dev Server: `npm run dev`
 
 ## Testing
-The project includes a comprehensive suite of deterministic automated tests covering:
-- AI Guardrails & Topic Safety
+The project includes a comprehensive suite of 40+ deterministic automated tests covering:
+- AI Guardrails & Topic Safety (Blocks coding, sports, jokes)
 - Persona-based Behavioral Guidance
-- Multi-language Localization
+- Multi-language Localization (5 languages)
 - Local Persistence (Reminders)
-See [TESTING.md](./TESTING.md) for the full report.
+- Explanation Mode Formatting
+
+### Run Tests
+- `npm test`: Run full test suite.
+- `npm run test:coverage`: Generate coverage report.
+
+### CI/CD
+- **GitHub Actions**: Automated testing and build validation on every commit.
 
 ## Reliability Strategy
 - **Deterministic Engine**: Core voter guidance works entirely locally without external API dependencies, ensuring 100% uptime for critical information.

@@ -2,28 +2,34 @@ import { describe, it, expect } from 'vitest';
 import { getAIResponse } from '../services/aiOrchestrator';
 
 describe('Persona Styles', () => {
-  it('should provide a detailed step-style response for first-time voters', async () => {
-    // Using 'eligible' which is a mapped keyword in trustLayer.ts
+  it('should provide detailed guidance for first-time voters', async () => {
     const response = await getAIResponse('eligible', 'first-time', 'simple', [], 'English');
     expect(response.answer).toContain('Welcome to your first election');
-    expect(response.answer).toContain('Voter Eligibility');
+    expect(response.answer).toContain('step-by-step');
   });
 
-  it('should provide a concise response for busy professionals', async () => {
+  it('should provide concise guidance for busy professionals', async () => {
     const response = await getAIResponse('eligible', 'busy', 'simple', [], 'English');
     expect(response.answer).toContain('keep it brief');
-    expect(response.answer).toContain('Voter Eligibility');
+    // Busy persona strips non-bullet lines in explanationModeService
+    expect(response.answer).not.toContain('Welcome to your first election');
   });
 
-  it('should provide a respectful response for senior citizens', async () => {
+  it('should provide simple/reassuring guidance for senior citizens', async () => {
     const response = await getAIResponse('eligible', 'elderly', 'simple', [], 'English');
+    expect(response.answer).toContain('Don\'t worry');
     expect(response.answer).toContain('assist you');
-    expect(response.answer).toContain('Voter Eligibility');
   });
 
-  it('should mention accessibility for accessibility-focused persona', async () => {
+  it('should mention accessibility for the accessibility persona', async () => {
     const response = await getAIResponse('eligible', 'accessibility', 'simple', [], 'English');
     expect(response.answer).toContain('accessible guide');
-    expect(response.answer).toContain('Voter Eligibility');
+    expect(response.answer).toContain('♿ Accessibility Note');
+  });
+
+  it('should differentiate between detailed and concise modes for the same persona', async () => {
+    const detailed = await getAIResponse('eligible', 'first-time', 'detailed', [], 'English');
+    const concise = await getAIResponse('eligible', 'first-time', 'concise', [], 'English');
+    expect(detailed.answer.length).toBeGreaterThan(concise.answer.length);
   });
 });

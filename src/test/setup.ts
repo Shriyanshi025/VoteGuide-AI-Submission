@@ -25,11 +25,22 @@ Object.defineProperty(window, 'localStorage', {
 });
 
 // Mock Notification API
+class MockNotification {
+  static permission = 'granted';
+  static requestPermission = vi.fn().mockResolvedValue('granted');
+  
+  title: string;
+  options?: any;
+  
+  constructor(title: string, options?: any) {
+    this.title = title;
+    this.options = options;
+  }
+  close = vi.fn();
+}
+
 Object.defineProperty(window, 'Notification', {
-  value: {
-    requestPermission: vi.fn().mockResolvedValue('granted'),
-    permission: 'granted',
-  },
+  value: MockNotification,
 });
 
 // Mock SpeechRecognition
