@@ -4,6 +4,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import dotenv from 'dotenv';
+import { enhanceWithGemini } from './services/geminiOptionalService';
 
 dotenv.config();
 
@@ -45,6 +46,7 @@ app.get('/health/google', (_req: Request, res: Response) => {
     cloudRun: "active",
     mode: "fallback-safe",
     geminiConfigured: !!process.env.GEMINI_API_KEY,
+    geminiMode: "optional-enhancement",
     mapsConfigured: !!process.env.GOOGLE_MAPS_API_KEY,
     googleServices: [
       "Google Cloud Run",
@@ -56,10 +58,22 @@ app.get('/health/google', (_req: Request, res: Response) => {
 });
 
 // Stable API Fallbacks (No External Dependencies)
-app.post('/api/chat', (req: Request, res: Response) => {
+app.post('/api/chat', async (req: Request, res: Response) => {
+  const { message, persona = 'Professional', language = 'English' } = req.body;
+  
+  const localAnswer = "I’m here to help with your voter journey! You can ask about eligibility, how to register, or where to find your booth. What specifically can I assist you with?";
+  
+  // Optional enhancement
+  const enhanced = await enhanceWithGemini({
+    userQuery: message || '',
+    localAnswer,
+    persona,
+    language
+  });
+
   res.json({
-    answer: "Chat is running in stable local mode. No external API connection required.",
-    attribution: "Local Knowledge Base",
+    answer: enhanced || localAnswer,
+    attribution: enhanced ? "Gemini Enhanced" : "Local Knowledge Base",
     verified: true
   });
 });
