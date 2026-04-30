@@ -7,7 +7,7 @@ const TOPIC_MAP: Record<string, string[]> = {
   submit_documents: ['provide documents', 'submit documents', 'upload documents', 'where submit', 'where upload', 'how to submit', 'where can i provide'],
   required_documents: ['documents needed', 'which documents', 'what id', 'proof', 'list of documents'],
   update_documents: ['update', 'change', 'modify', 'correction', 'edit documents'],
-  eligibility: ['eligible', 'age', '18', 'citizen', 'can i vote', 'qualification'],
+  eligibility: ['eligibility', 'eligible', 'age', '18', 'citizen', 'can i vote', 'qualification'],
   registration: ['register', 'form', 'enroll', 'new voter', 'form 6', 'form 8'],
   verification: ['list', 'verify', 'check name', 'electoral roll', 'nvsp'],
   polling_booth: ['booth', 'station', 'where to vote', 'part number', 'location'],
