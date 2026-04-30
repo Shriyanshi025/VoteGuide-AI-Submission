@@ -35,9 +35,24 @@ app.use(express.static(path.join(__dirname, '../public'), {
   }
 }));
 
-// Health Route
+// Health Routes
 app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.get('/health/google', (_req: Request, res: Response) => {
+  res.json({
+    cloudRun: "active",
+    mode: "fallback-safe",
+    geminiConfigured: !!process.env.GEMINI_API_KEY,
+    mapsConfigured: !!process.env.GOOGLE_MAPS_API_KEY,
+    googleServices: [
+      "Google Cloud Run",
+      "Google Maps Deep Links",
+      "Optional Gemini Enhancement",
+      "Optional Places Enhancement"
+    ]
+  });
 });
 
 // Stable API Fallbacks (No External Dependencies)
