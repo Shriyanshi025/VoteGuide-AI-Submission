@@ -30,4 +30,21 @@ describe('Booth Finder Map URLs', () => {
     expect(result).not.toContain('key=');
     expect(result).toContain('google.com/maps/search');
   });
+
+  it('should NOT contain the old "polling booth" search query in any URL', () => {
+    const election = getElectionOfficeUrl(lat, lng);
+    const government = getGovernmentOfficeUrl(lat, lng);
+    const station = getPollingStationUrl(lat, lng);
+    const fallback = getFallbackMapsUrl();
+
+    expect(election).not.toContain('polling+booth');
+    expect(government).not.toContain('polling+booth');
+    expect(station).not.toContain('polling+booth');
+    expect(fallback).not.toContain('polling+booth');
+    
+    expect(election).not.toContain('polling%20booth');
+    expect(government).not.toContain('polling%20booth');
+    expect(station).not.toContain('polling%20booth');
+    expect(fallback).not.toContain('polling%20booth');
+  });
 });
