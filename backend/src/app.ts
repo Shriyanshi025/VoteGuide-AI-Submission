@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import dotenv from 'dotenv';
 import { enhanceWithGemini } from './services/geminiOptionalService';
+import { getLocalElectionAnswer } from './services/localIntentRouter';
 
 dotenv.config();
 
@@ -60,12 +61,28 @@ app.get('/health/google', (_req: Request, res: Response) => {
 // Stable API Fallbacks (No External Dependencies)
 app.post('/api/chat', async (req: Request, res: Response) => {
   const { message, persona = 'Professional', language = 'English' } = req.body;
+  const query = message || '';
+  const q = query.toLowerCase();
   
-  const localAnswer = "I’m here to help with your voter journey! You can ask about eligibility, how to register, or where to find your booth. What specifically can I assist you with?";
+  // 1. Off-topic Guardrail
+  const offTopicKeywords = ['weather', 'joke', 'ipl', 'score', 'movie', 'film', 'song', 'news', 'price', 'buy', 'shop', 'game', 'play'];
+  if (offTopicKeywords.some(kw => q.includes(kw))) {
+    return res.json({
+      answer: "I’m VoteGuide AI and I can help only with Indian voter guidance (eligibility, registration, polling booth, voter ID, election help). What would you like help with?",
+      verified: true,
+      attribution: "Local Guardrail"
+    });
+  }
+
+  // 2. Detect local intent
+  const electionAnswer = getLocalElectionAnswer(query, language);
   
-  // Optional enhancement
+  // 3. Final Fallback if no intent detected
+  const localAnswer = electionAnswer || "I’m here to help with your voter journey! You can ask about eligibility, how to register, or where to find your booth. What specifically can I assist you with?";
+  
+  // 4. Optional Gemini enhancement
   const enhanced = await enhanceWithGemini({
-    userQuery: message || '',
+    userQuery: query,
     localAnswer,
     persona,
     language
