@@ -70,7 +70,7 @@ app.get('/api/booths', (req: Request, res: Response) => {
 
 // SPA Fallback
 app.get("*", (req: Request, res: Response) => {
-  if (req.path.startsWith('/api') || req.path === '/health') return;
+  if (req.path.startsWith('/api') || req.path.startsWith('/health')) return;
   res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
