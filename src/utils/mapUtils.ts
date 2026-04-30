@@ -1,13 +1,22 @@
 /**
- * Generates a Google Maps search URL for polling booths at specific coordinates.
+ * Generates Google Maps search URLs for election-related locations.
  */
-export const getBoothMapsUrl = (lat: number, lng: number): string => {
-  return `https://www.google.com/maps/search/polling+booth/@${lat},${lng},15z`;
+
+export const getElectionOfficeUrl = (lat: number, lng: number): string => {
+  return `https://www.google.com/maps/search/election+office+near+me/@${lat},${lng},14z`;
+};
+
+export const getGovernmentOfficeUrl = (lat: number, lng: number): string => {
+  return `https://www.google.com/maps/search/government+office+near+me/@${lat},${lng},14z`;
+};
+
+export const getPollingStationUrl = (lat: number, lng: number): string => {
+  return `https://www.google.com/maps/search/polling+station+near+me/@${lat},${lng},14z`;
 };
 
 /**
- * Returns the fallback Google Maps search URL for polling booths near the user.
+ * Returns the fallback Google Maps search URL.
  */
 export const getFallbackMapsUrl = (): string => {
-  return "https://www.google.com/maps/search/polling+booth+near+me";
+  return "https://www.google.com/maps/search/election+office+near+me";
 };

@@ -1,14 +1,13 @@
 import React from 'react';
 import { useLocation } from '../../hooks/useLocation';
-import { getBoothMapsUrl, getFallbackMapsUrl } from '../../utils/mapUtils';
+import { getElectionOfficeUrl, getGovernmentOfficeUrl, getPollingStationUrl, getFallbackMapsUrl } from '../../utils/mapUtils';
 
 export const BoothFinder: React.FC = () => {
   const { coords, loading: locLoading, error: locError, getLocation } = useLocation();
 
-  const mapsUrl = coords 
-    ? getBoothMapsUrl(coords.lat, coords.lng)
-    : '#';
-  
+  const electionUrl = coords ? getElectionOfficeUrl(coords.lat, coords.lng) : '#';
+  const governmentUrl = coords ? getGovernmentOfficeUrl(coords.lat, coords.lng) : '#';
+  const stationUrl = coords ? getPollingStationUrl(coords.lat, coords.lng) : '#';
   const fallbackUrl = getFallbackMapsUrl();
 
   return (
@@ -18,7 +17,7 @@ export const BoothFinder: React.FC = () => {
           <div style={{ fontSize: '3rem', marginBottom: 'var(--space-md)' }}>📍</div>
           <h2>Find Your Booth</h2>
           <p style={{ opacity: 0.7, marginBottom: 'var(--space-lg)' }}>
-            We use your location to help you find the nearest polling station.
+            Detect your location to find nearby election offices and guidance centers.
           </p>
           <button 
             className="cta-button" 
@@ -57,29 +56,45 @@ export const BoothFinder: React.FC = () => {
           </div>
 
           <div style={{ background: 'var(--primary-light)', padding: 'var(--space-md)', borderRadius: '8px', marginBottom: 'var(--space-md)' }}>
-            <p style={{ margin: 0, fontSize: '0.9rem' }}>
-              <strong>Guidance:</strong> Use the button below to see the official polling booths indexed by Google Maps based on your current location.
+            <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: '1.4' }}>
+              <strong>Important:</strong> Polling booths may not always appear as permanent places on Google Maps. Use these links to find nearby election/government help centers, and verify your final booth from your voter slip or official voter portal.
             </p>
           </div>
 
-          <a 
-            href={mapsUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="cta-button"
-            style={{ 
-              display: 'block', 
-              textAlign: 'center', 
-              textDecoration: 'none',
-              background: '#4285F4', // Google Blue
-              color: 'white'
-            }}
-          >
-            Open nearby polling booths in Google Maps
-          </a>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+            <a 
+              href={electionUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="cta-button"
+              style={{ textAlign: 'center', textDecoration: 'none', background: '#4285F4', color: 'white' }}
+            >
+              Find nearby Election Office
+            </a>
+
+            <a 
+              href={governmentUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="cta-button"
+              style={{ textAlign: 'center', textDecoration: 'none', background: '#34A853', color: 'white' }}
+            >
+              Find nearby Government Office
+            </a>
+
+            <a 
+              href={stationUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="cta-button"
+              style={{ textAlign: 'center', textDecoration: 'none', background: '#FBBC05', color: 'black' }}
+            >
+              Search Polling Station
+            </a>
+          </div>
           
           <p style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: 'var(--space-md)', textAlign: 'center' }}>
-            Clicking above will open Google Maps in a new tab with a search for "polling booth" at your coordinates.
+            Links open Google Maps search for reliable election infrastructure near your coordinates.
           </p>
         </div>
       )}
