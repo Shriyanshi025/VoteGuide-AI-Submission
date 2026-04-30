@@ -28,15 +28,7 @@ Object.defineProperty(window, 'localStorage', {
 class MockNotification {
   static permission = 'granted';
   static requestPermission = vi.fn().mockResolvedValue('granted');
-  
-  title: string;
-  options?: any;
-  
-  constructor(title: string, options?: any) {
-    this.title = title;
-    this.options = options;
-  }
-  close = vi.fn();
+  constructor() {}
 }
 
 Object.defineProperty(window, 'Notification', {

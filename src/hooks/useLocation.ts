@@ -18,7 +18,7 @@ export const useLocation = () => {
 
   const getLocation = () => {
     if (!navigator.geolocation) {
-      setState(s => ({ ...s, error: 'Geolocation not supported' }));
+      setState(s => ({ ...s, error: 'Location detection is not supported in this browser.' }));
       return;
     }
 
@@ -36,10 +36,14 @@ export const useLocation = () => {
         });
       },
       (error) => {
+        let errorMsg = error.message;
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMsg = 'Location permission is needed to find nearby polling booth guidance.';
+        }
         setState({
           coords: null,
           loading: false,
-          error: error.message,
+          error: errorMsg,
         });
       },
       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
