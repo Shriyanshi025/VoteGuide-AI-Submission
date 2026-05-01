@@ -51,14 +51,15 @@ app.get('/health/google', (_req: Request, res: Response) => {
     geminiConfigured: !!process.env.GEMINI_API_KEY,
     geminiMode: "optional-enhancement",
     mapsConfigured: !!process.env.GOOGLE_MAPS_API_KEY,
-    placesConfigured: !!process.env.GOOGLE_MAPS_API_KEY,
+    placesConfigured: !!(process.env.GOOGLE_MAPS_API_KEY || process.env.GOOGLE_PLACES_SERVER_KEY),
+    placesServerKeyConfigured: !!process.env.GOOGLE_PLACES_SERVER_KEY,
     placesMode: "optional-enhancement",
     googleServices: [
       "Google Cloud Run",
       "Google Maps Deep Links",
-      "Optional Gemini Enhancement",
-      "Optional Places Enhancement"
-    ]
+      process.env.GEMINI_API_KEY ? "Optional Gemini Enhancement" : null,
+      (process.env.GOOGLE_MAPS_API_KEY || process.env.GOOGLE_PLACES_SERVER_KEY) ? "Optional Places Enhancement" : null
+    ].filter(Boolean)
   });
 });
 
@@ -112,8 +113,13 @@ app.get('/api/places/nearby', async (req: Request, res: Response) => {
     return res.json({ places: [] });
   }
 
-  const places = await findNearbyElectionPlaces(latitude, longitude);
-  res.json({ places });
+  try {
+    const places = await findNearbyElectionPlaces(latitude, longitude);
+    res.json({ places });
+  } catch (error) {
+    console.error('Places API error:', error);
+    res.json({ places: [] });
+  }
 });
 
 // SPA Fallback

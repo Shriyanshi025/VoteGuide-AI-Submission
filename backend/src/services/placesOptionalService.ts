@@ -1,102 +1,82 @@
 
+import axios from 'axios';
+
 /**
  * Optional service to find nearby election-related places using Google Places API.
- * This service is designed to fail gracefully and return an empty list if:
- * - API Key is missing
- * - API returns an error
- * - API request times out (3s)
+ * 
+ * NOTE: If the GOOGLE_MAPS_API_KEY has "HTTP Referer" restrictions, this backend 
+ * service will return empty results because Google denies server-side requests 
+ * from restricted keys. For full functionality, ensure the API key is either 
+ * unrestricted or restricted by IP address (the Cloud Run egress IP).
  */
 
 export const findNearbyElectionPlaces = async (lat: number, lng: number) => {
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  const apiKey = process.env.GOOGLE_PLACES_SERVER_KEY || process.env.GOOGLE_MAPS_API_KEY;
 
   if (!apiKey) {
-    console.warn("GOOGLE_MAPS_API_KEY missing, skipping Places suggestions.");
     return [];
   }
 
-  // Broadened query including reliable civic/election-related terms
+  // Civic/Election help terms
   const terms = [
-    "polling station",
     "election office",
     "government office",
     "municipal office",
     "collector office",
-    "tehsil office",
-    "community center",
-    "public school"
+    "public school",
+    "community center"
   ];
-  const query = terms.join(" OR ");
-  const url = "https://places.googleapis.com/v1/places:searchText";
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
+  const uniquePlaces = new Map();
+  const startTime = Date.now();
+  const timeoutBudget = 4000; // 4s budget for sequential calls
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.types'
-      },
-      body: JSON.stringify({
-        textQuery: query,
-        locationBias: {
-          circle: {
-            center: { latitude: lat, longitude: lng },
-            radius: 5000.0 // 5km radius
-          }
-        }
-      }),
-      signal: controller.signal
-    });
+  for (const term of terms) {
+    if (uniquePlaces.size >= 3 || (Date.now() - startTime) > timeoutBudget) break;
 
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      console.warn(`Places API error: ${response.status} ${response.statusText}`);
-      return [];
-    }
-
-    const data = await response.json();
-    
-    if (!data.places || !Array.isArray(data.places)) {
-      return [];
-    }
-
-    // De-duplicate by ID and limit to 5
-    const uniquePlaces = new Map();
-    for (const p of data.places) {
-      if (!p.id || uniquePlaces.has(p.id)) continue;
-      
-      uniquePlaces.set(p.id, {
-        id: p.id,
-        name: p.displayName?.text || "Unknown Place",
-        address: p.formattedAddress || "Address unavailable",
-        lat: p.location?.latitude || lat,
-        lng: p.location?.longitude || lng,
-        mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.displayName?.text || "")}&query_place_id=${p.id}`,
-        type: determinePlaceType(p.types || [])
+    try {
+      // Nearby Search (Legacy) is robust for coordinate-based keyword matching
+      const response = await axios.get('https://maps.googleapis.com/maps/api/place/nearbysearch/json', {
+        params: {
+          location: `${lat},${lng}`,
+          radius: 10000,
+          keyword: term,
+          key: apiKey
+        },
+        timeout: 2000
       });
 
-      if (uniquePlaces.size >= 5) break;
+      if (response.data.status === 'OK' && response.data.results) {
+        for (const p of response.data.results) {
+          if (!uniquePlaces.has(p.place_id)) {
+            uniquePlaces.set(p.place_id, {
+              id: p.place_id,
+              name: p.name,
+              address: p.vicinity || p.formatted_address || "Address unavailable",
+              lat: p.geometry?.location?.lat || lat,
+              lng: p.geometry?.location?.lng || lng,
+              mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name)}&query_place_id=${p.place_id}`,
+              type: determinePlaceType(p.types || [])
+            });
+          }
+          if (uniquePlaces.size >= 5) break;
+        }
+      } else if (response.data.status === 'REQUEST_DENIED') {
+        // Log restriction details for developer visibility in Cloud Run logs
+        console.error("Google Places API Request Denied. Likely due to API key restrictions (e.g. Referer restrictions on a server-side call).");
+        break; // Stop trying if denied
+      }
+    } catch (err: any) {
+      console.warn(`Search for "${term}" failed:`, err.message);
     }
-
-    return Array.from(uniquePlaces.values());
-
-  } catch (error: any) {
-    if (error.name === 'AbortError') {
-      console.warn("Places API request timed out (3s).");
-    } else {
-      console.warn("Places API fetch failed:", error.message);
-    }
-    return [];
   }
+
+  return Array.from(uniquePlaces.values());
 };
 
 const determinePlaceType = (types: string[]): string => {
   if (types.includes('government_office')) return 'Government Office';
   if (types.includes('city_hall') || types.includes('local_government_office')) return 'Election/Admin Office';
-  return 'Polling Station Suggestion';
+  if (types.includes('school')) return 'Public School (Common Booth Location)';
+  return 'Civic Help Center';
 };
