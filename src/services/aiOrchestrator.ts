@@ -19,7 +19,11 @@ export const getAIResponse = async (
 ): Promise<Attribution> => {
   const cleanQuery = query.toLowerCase().trim();
   const greetings = ['hi', 'hello', 'hey', 'namaste', 'greet', 'morning', 'evening', 'ok', 'hmm', 'thanks'];
-  const offTopicKeywords = ['weather', 'joke', 'ipl', 'score', 'movie', 'film', 'song', 'news', 'price', 'buy', 'shop', 'game', 'play'];
+  const offTopicKeywords = [
+    'weather', 'joke', 'ipl', 'score', 'movie', 'film', 'song', 'news', 
+    'price', 'buy', 'shop', 'game', 'play', 'code', 'python', 'javascript', 
+    'programming', 'app', 'develop'
+  ];
 
   const t = translations[language];
 

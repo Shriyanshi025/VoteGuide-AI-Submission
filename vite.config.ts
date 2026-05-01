@@ -22,6 +22,12 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     globals: true,
-    exclude: ['**/node_modules/**', '**/dist/**', 'VoteGuide-AI-Submission/**'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/coverage/**', 'backend/**'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/services/**', 'src/components/**', 'src/i18n/**', 'src/store/**', 'src/utils/**'],
+      exclude: ['src/tests/**', 'src/test/**', '**/*.test.ts'],
+      reporter: ['text', 'json', 'html'],
+    }
   },
-} as any)
+})
