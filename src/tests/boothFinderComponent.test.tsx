@@ -75,7 +75,7 @@ describe('BoothFinder Component', () => {
     expect(screen.getByText(/Find nearby Election Office/i)).toBeDefined();
   });
 
-  it('marks journey step complete when a place is selected', async () => {
+  it('marks journey step complete and redirects to journey tab when a place is selected', async () => {
     (useLocation as any).mockReturnValue({
       coords: { lat: 12.97, lng: 77.59 },
       loading: false,
@@ -88,9 +88,6 @@ describe('BoothFinder Component', () => {
     ];
     (backendClient.getNearbyPlaces as any).mockResolvedValue({ places: mockPlaces });
 
-    // Mock window.alert
-    const alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {});
-
     render(<BoothFinder />);
 
     await waitFor(() => {
@@ -98,7 +95,17 @@ describe('BoothFinder Component', () => {
       fireEvent.click(selectButton);
     });
 
-    expect(localStorage.getItem('selectedPollingPlace')).toContain('Live Election Office');
-    expect(alertMock).toHaveBeenCalled();
+    // Verify localStorage
+    const stored = JSON.parse(localStorage.getItem('selectedPollingPlace') || '{}');
+    expect(stored.name).toBe('Live Election Office');
+    
+    // Verify Journey state via hook (mocked or actual)
+    // Since we use the actual store, we can check it
+    const journey = (await import('../store/useJourneyStore')).useJourneyStore.getState();
+    expect(journey.readiness.boothFound).toBe(true);
+    
+    // Verify UI Tab redirection
+    const ui = (await import('../store/useUIStore')).useUIStore.getState();
+    expect(ui.currentView).toBe('journey');
   });
 });

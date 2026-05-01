@@ -100,10 +100,6 @@ app.post('/api/chat', async (req: Request, res: Response) => {
   });
 });
 
-app.get('/api/booths', (req: Request, res: Response) => {
-  res.json([]); // Legacy endpoint
-});
-
 app.get('/api/places/nearby', async (req: Request, res: Response) => {
   const { lat, lng } = req.query;
   const latitude = parseFloat(lat as string);

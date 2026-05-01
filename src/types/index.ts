@@ -70,3 +70,26 @@ export interface Attribution {
   verified: boolean;
   suggestions?: string[];
 }
+
+export interface PlaceResult {
+  id: string;
+  name: string;
+  address: string;
+  lat: number;
+  lng: number;
+  mapsUrl: string;
+  type: string;
+  selectedAt?: string;
+}
+
+export interface GoogleHealthResponse {
+  cloudRun: string;
+  mode: string;
+  geminiConfigured: boolean;
+  geminiMode: string;
+  mapsConfigured: boolean;
+  placesConfigured: boolean;
+  placesServerKeyConfigured: boolean;
+  placesMode: string;
+  googleServices: string[];
+}

@@ -3,14 +3,18 @@ import { useLocation } from '../../hooks/useLocation';
 import { getElectionOfficeUrl, getGovernmentOfficeUrl, getPollingStationUrl, getFallbackMapsUrl } from '../../utils/mapUtils';
 import { getNearbyPlaces } from '../../api/backendClient';
 import { useJourneyStore } from '../../store/useJourneyStore';
+import { useUIStore } from '../../store/useUIStore';
+import { STORAGE_KEYS } from '../../utils/constants';
+import type { PlaceResult } from '../../types';
 
 export const BoothFinder: React.FC = () => {
   const { coords, loading: locLoading, error: locError, getLocation } = useLocation();
-  const [places, setPlaces] = useState<any[]>([]);
+  const [places, setPlaces] = useState<PlaceResult[]>([]);
   const [loadingPlaces, setLoadingPlaces] = useState(false);
   
   const updateStepStatus = useJourneyStore(state => state.updateStepStatus);
   const updateReadiness = useJourneyStore(state => state.updateReadiness);
+  const setCurrentView = useUIStore(state => state.setCurrentView);
 
   useEffect(() => {
     if (coords) {
@@ -24,25 +28,26 @@ export const BoothFinder: React.FC = () => {
       const data = await getNearbyPlaces(lat, lng);
       setPlaces(data.places || []);
     } catch (err) {
-      console.error("Error fetching places:", err);
+      // Fallback-safe: If Places API fails, we still show the Google Maps deep-links below
       setPlaces([]);
     } finally {
       setLoadingPlaces(false);
     }
   };
 
-  const handleSelectPlace = (place: any) => {
-    const selectedPlace = {
+  const handleSelectPlace = (place: PlaceResult) => {
+    const selectedPlace: PlaceResult = {
       ...place,
       selectedAt: new Date().toISOString()
     };
-    localStorage.setItem('selectedPollingPlace', JSON.stringify(selectedPlace));
+    localStorage.setItem(STORAGE_KEYS.SELECTED_PLACE, JSON.stringify(selectedPlace));
     
     // Mark journey step complete
     updateStepStatus('booth', 'completed');
     updateReadiness({ boothFound: true });
     
-    alert(`Selected: ${place.name}. This has been marked as your polling location in your journey!`);
+    // Navigate to Journey tab
+    setCurrentView('journey');
   };
 
   const electionUrl = coords ? getElectionOfficeUrl(coords.lat, coords.lng) : '#';
