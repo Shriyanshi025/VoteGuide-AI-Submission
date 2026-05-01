@@ -14,12 +14,15 @@ VoteGuide AI prioritizes reliability through a multi-layered testing approach:
 | `persona.test.ts` | Validates that responses are tailored to different voter personas. | PASS |
 | `reminder.test.ts` | Tests localStorage persistence for vote day reminders. | PASS |
 | `language.test.ts` | Verifies multi-language support (EN, HI, BN, TA, TE). | PASS |
+| `health.test.ts` | Verifies Google services configuration and server-key detection. | PASS |
+| `places.test.ts` | Validates multi-query search strategy and legacy fallback logic. | PASS |
 
 ## Manual Test Cases
 | Feature | Case | Expected Result | Status |
 |---------|------|-----------------|--------|
 | Greeting | User opens app | App presents a friendly greeting and 7 quick actions. | PASS |
-| Booth Finder | User clicks "Find Booth" | Opens Google Maps deep-link at the user's location. | PASS |
+| Booth Finder | User opens Booth Finder | App detects location and shows live nearby polling help suggestions. | PASS |
+| Booth Fallback | Places API fails | UI shows a helpful message and 100% reliable Google Maps deep-links. | PASS |
 | Reminder | User sets a reminder | A notification is scheduled/shown when due. | PASS |
 | Dark Mode | Toggle theme | App switches between high-contrast light and dark modes. | PASS |
 | Accessibility | Screen Reader test | All core buttons have descriptive ARIA labels. | PASS |

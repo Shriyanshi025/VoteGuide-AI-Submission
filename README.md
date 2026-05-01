@@ -31,10 +31,12 @@ See [TESTING.md](./TESTING.md) for the full report.
 ## Google Services Integration
 VoteGuide AI is architected to leverage Google's ecosystem for a premium voter experience:
 *   **Google Cloud Run**: The application is containerized and deployed on Google Cloud Run for high availability and serverless scalability.
-*   **Google Maps Deep Links**: Uses standard mapping protocols for deterministic, location-based guidance to help voters find election and government help centers.
-*   **Optional Gemini Enhancement**: Designed with an optional integration layer for Google Gemini to provide advanced conversational capabilities while maintaining a local fallback.
-*   **Optional Google Places Enhancement**: Ready for integration with Google Places API for real-time indexing of dynamic polling locations.
-*   **Fallback-Safe Architecture**: Our "Stability-First" design ensures that the core app flow remains functional even if external API dependencies are unavailable, preventing service disruptions.
+*   **Google Maps Deep Links**: Uses standard mapping protocols for deterministic, location-based guidance.
+*   **Google Places API**: Provides real-time local indexing of civic help centers and polling stations.
+    *   **Frontend**: Browser-based Maps key may use HTTP referrer restriction for security.
+    *   **Backend**: Uses `GOOGLE_PLACES_SERVER_KEY` for authenticated server-side requests.
+*   **Optional Gemini Enhancement**: Designed with an optional integration layer for Google Gemini to provide advanced conversational capabilities.
+*   **Stability-First Fallback**: Our architecture ensures that if the Places API is unavailable, Google Maps deep-links remain active as a 100% reliable fallback.
 
 ## Google Services Usage
 - **Google Cloud Run**: Hosts the fullstack containerized application.
