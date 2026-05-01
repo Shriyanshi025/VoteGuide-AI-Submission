@@ -15,9 +15,18 @@ export const findNearbyElectionPlaces = async (lat: number, lng: number) => {
     return [];
   }
 
-  // Google Places API (New) Text Search
-  // We search for three specific types of places
-  const query = "election office OR government office OR polling station";
+  // Broadened query including reliable civic/election-related terms
+  const terms = [
+    "polling station",
+    "election office",
+    "government office",
+    "municipal office",
+    "collector office",
+    "tehsil office",
+    "community center",
+    "public school"
+  ];
+  const query = terms.join(" OR ");
   const url = "https://places.googleapis.com/v1/places:searchText";
 
   try {
@@ -56,16 +65,25 @@ export const findNearbyElectionPlaces = async (lat: number, lng: number) => {
       return [];
     }
 
-    // Normalize results
-    return data.places.map((p: any) => ({
-      id: p.id,
-      name: p.displayName?.text || "Unknown Place",
-      address: p.formattedAddress || "Address unavailable",
-      lat: p.location?.latitude || lat,
-      lng: p.location?.longitude || lng,
-      mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.displayName?.text || "")}&query_place_id=${p.id}`,
-      type: determinePlaceType(p.types || [])
-    }));
+    // De-duplicate by ID and limit to 5
+    const uniquePlaces = new Map();
+    for (const p of data.places) {
+      if (!p.id || uniquePlaces.has(p.id)) continue;
+      
+      uniquePlaces.set(p.id, {
+        id: p.id,
+        name: p.displayName?.text || "Unknown Place",
+        address: p.formattedAddress || "Address unavailable",
+        lat: p.location?.latitude || lat,
+        lng: p.location?.longitude || lng,
+        mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.displayName?.text || "")}&query_place_id=${p.id}`,
+        type: determinePlaceType(p.types || [])
+      });
+
+      if (uniquePlaces.size >= 5) break;
+    }
+
+    return Array.from(uniquePlaces.values());
 
   } catch (error: any) {
     if (error.name === 'AbortError') {

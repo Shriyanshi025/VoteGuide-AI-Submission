@@ -14,19 +14,19 @@ describe('Places Optional Service', () => {
     expect(result).toEqual([]);
   });
 
-  it('should return normalized places on success', async () => {
-    // Mock global fetch
+  it('should return normalized places on success and limit to 5', async () => {
+    // Mock global fetch with 6 places (2 duplicates by ID)
     const mockResponse = {
       ok: true,
       json: async () => ({
         places: [
-          {
-            id: 'p1',
-            displayName: { text: 'Test Office' },
-            formattedAddress: '123 Test St',
-            location: { latitude: 12.98, longitude: 77.60 },
-            types: ['government_office']
-          }
+          { id: 'p1', displayName: { text: 'Office 1' }, location: { latitude: 12.98, longitude: 77.60 } },
+          { id: 'p1', displayName: { text: 'Office 1 Duplicate' }, location: { latitude: 12.98, longitude: 77.60 } },
+          { id: 'p2', displayName: { text: 'Office 2' }, location: { latitude: 12.99, longitude: 77.61 } },
+          { id: 'p3', displayName: { text: 'Office 3' }, location: { latitude: 12.95, longitude: 77.55 } },
+          { id: 'p4', displayName: { text: 'Office 4' }, location: { latitude: 12.94, longitude: 77.54 } },
+          { id: 'p5', displayName: { text: 'Office 5' }, location: { latitude: 12.93, longitude: 77.53 } },
+          { id: 'p6', displayName: { text: 'Office 6' }, location: { latitude: 12.92, longitude: 77.52 } },
         ]
       })
     };
@@ -34,16 +34,17 @@ describe('Places Optional Service', () => {
 
     const result = await findNearbyElectionPlaces(12.97, 77.59);
     
-    expect(result).toHaveLength(1);
-    expect(result[0]).toEqual({
-      id: 'p1',
-      name: 'Test Office',
-      address: '123 Test St',
-      lat: 12.98,
-      lng: 77.60,
-      mapsUrl: expect.stringContaining('p1'),
-      type: 'Government Office'
-    });
+    expect(result).toHaveLength(5); // Limited to 5
+    expect(result[0].id).toBe('p1');
+    expect(result[1].id).toBe('p2');
+    // Ensure fetch was called with correct coordinates
+    const callArgs = (global.fetch as any).mock.calls[0][1];
+    const body = JSON.parse(callArgs.body);
+    expect(body.locationBias.circle.center.latitude).toBe(12.97);
+    expect(body.locationBias.circle.center.longitude).toBe(77.59);
+    // Ensure query contains broadened terms
+    expect(body.textQuery).toContain('polling station');
+    expect(body.textQuery).toContain('public school');
   });
 
   it('should return empty list on API error', async () => {

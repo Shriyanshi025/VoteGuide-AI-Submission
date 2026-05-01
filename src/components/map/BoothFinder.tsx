@@ -101,7 +101,7 @@ export const BoothFinder: React.FC = () => {
 
           {/* Live Places Suggestions */}
           <div className="live-places" style={{ marginBottom: 'var(--space-lg)' }}>
-            <h4 style={{ marginBottom: 'var(--space-sm)' }}>Nearby Help Centers (Live)</h4>
+            <h4 style={{ marginBottom: 'var(--space-sm)' }}>Nearby Polling Help Locations</h4>
             
             {loadingPlaces && (
               <div style={{ padding: 'var(--space-md)', textAlign: 'center', opacity: 0.7 }}>
@@ -146,6 +146,16 @@ export const BoothFinder: React.FC = () => {
                 ))}
               </div>
             )}
+            
+            {!loadingPlaces && places.length === 0 && !placesError && (
+              <p style={{ fontSize: '0.85rem', opacity: 0.7, marginBottom: 'var(--space-md)' }}>
+                Live suggestions are not available here yet. You can still use the Google Maps links below.
+              </p>
+            )}
+
+            <p style={{ fontSize: '0.75rem', opacity: 0.8, background: '#f5f5f5', padding: '8px', borderRadius: '4px', marginTop: 'var(--space-sm)' }}>
+              <strong>Note:</strong> These are suggested civic/election help locations. Final polling booth should be verified from your voter slip or official voter portal.
+            </p>
           </div>
 
           <hr style={{ border: 0, borderTop: '1px solid #eee', marginBottom: 'var(--space-lg)' }} />

@@ -67,6 +67,7 @@ describe('BoothFinder Component', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Live Election Office')).toBeDefined();
+      expect(screen.getByText('Nearby Polling Help Locations')).toBeDefined();
       expect(screen.getByText('Select this place')).toBeDefined();
     });
     
