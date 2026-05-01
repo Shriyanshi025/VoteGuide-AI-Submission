@@ -30,4 +30,4 @@ export default defineConfig({
       reporter: ['text', 'json', 'html'],
     }
   },
-})
+} as any)
