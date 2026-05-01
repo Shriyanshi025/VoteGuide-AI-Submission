@@ -6,6 +6,8 @@ import compression from 'compression';
 import dotenv from 'dotenv';
 import { enhanceWithGemini } from './services/geminiOptionalService';
 import { getLocalElectionAnswer } from './services/localIntentRouter';
+import { findNearbyElectionPlaces } from './services/placesOptionalService';
+
 
 dotenv.config();
 
@@ -49,6 +51,8 @@ app.get('/health/google', (_req: Request, res: Response) => {
     geminiConfigured: !!process.env.GEMINI_API_KEY,
     geminiMode: "optional-enhancement",
     mapsConfigured: !!process.env.GOOGLE_MAPS_API_KEY,
+    placesConfigured: !!process.env.GOOGLE_MAPS_API_KEY,
+    placesMode: "optional-enhancement",
     googleServices: [
       "Google Cloud Run",
       "Google Maps Deep Links",
@@ -96,7 +100,20 @@ app.post('/api/chat', async (req: Request, res: Response) => {
 });
 
 app.get('/api/booths', (req: Request, res: Response) => {
-  res.json([]); // Empty response, frontend handles mapping locally now
+  res.json([]); // Legacy endpoint
+});
+
+app.get('/api/places/nearby', async (req: Request, res: Response) => {
+  const { lat, lng } = req.query;
+  const latitude = parseFloat(lat as string);
+  const longitude = parseFloat(lng as string);
+
+  if (isNaN(latitude) || isNaN(longitude)) {
+    return res.json({ places: [] });
+  }
+
+  const places = await findNearbyElectionPlaces(latitude, longitude);
+  res.json({ places });
 });
 
 // SPA Fallback

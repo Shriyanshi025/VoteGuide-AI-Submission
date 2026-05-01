@@ -33,3 +33,13 @@ export const createReminder = async (type: string, data: any) => {
   });
   return response.json();
 };
+export const getNearbyPlaces = async (lat: number, lng: number) => {
+  try {
+    const response = await fetch(`${API_BASE}/api/places/nearby?lat=${lat}&lng=${lng}`);
+    if (!response.ok) return { places: [] };
+    return response.json();
+  } catch (error) {
+    console.error('Failed to fetch nearby places:', error);
+    return { places: [] };
+  }
+};

@@ -1,9 +1,53 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation } from '../../hooks/useLocation';
 import { getElectionOfficeUrl, getGovernmentOfficeUrl, getPollingStationUrl, getFallbackMapsUrl } from '../../utils/mapUtils';
+import { getNearbyPlaces } from '../../api/backendClient';
+import { useJourneyStore } from '../../store/useJourneyStore';
 
 export const BoothFinder: React.FC = () => {
   const { coords, loading: locLoading, error: locError, getLocation } = useLocation();
+  const [places, setPlaces] = useState<any[]>([]);
+  const [loadingPlaces, setLoadingPlaces] = useState(false);
+  const [placesError, setPlacesError] = useState<string | null>(null);
+  
+  const updateStepStatus = useJourneyStore(state => state.updateStepStatus);
+  const updateReadiness = useJourneyStore(state => state.updateReadiness);
+
+  useEffect(() => {
+    if (coords) {
+      fetchNearbyPlaces(coords.lat, coords.lng);
+    }
+  }, [coords]);
+
+  const fetchNearbyPlaces = async (lat: number, lng: number) => {
+    setLoadingPlaces(true);
+    setPlacesError(null);
+    try {
+      const data = await getNearbyPlaces(lat, lng);
+      setPlaces(data.places || []);
+      if (!data.places || data.places.length === 0) {
+        setPlacesError("Could not load live suggestions. You can still use Google Maps links below.");
+      }
+    } catch (err) {
+      setPlacesError("Could not load live suggestions. You can still use Google Maps links below.");
+    } finally {
+      setLoadingPlaces(false);
+    }
+  };
+
+  const handleSelectPlace = (place: any) => {
+    const selectedPlace = {
+      ...place,
+      selectedAt: new Date().toISOString()
+    };
+    localStorage.setItem('selectedPollingPlace', JSON.stringify(selectedPlace));
+    
+    // Mark journey step complete
+    updateStepStatus('booth', 'completed');
+    updateReadiness({ boothFound: true });
+    
+    alert(`Selected: ${place.name}. This has been marked as your polling location in your journey!`);
+  };
 
   const electionUrl = coords ? getElectionOfficeUrl(coords.lat, coords.lng) : '#';
   const governmentUrl = coords ? getGovernmentOfficeUrl(coords.lat, coords.lng) : '#';
@@ -55,9 +99,61 @@ export const BoothFinder: React.FC = () => {
             </div>
           </div>
 
+          {/* Live Places Suggestions */}
+          <div className="live-places" style={{ marginBottom: 'var(--space-lg)' }}>
+            <h4 style={{ marginBottom: 'var(--space-sm)' }}>Nearby Help Centers (Live)</h4>
+            
+            {loadingPlaces && (
+              <div style={{ padding: 'var(--space-md)', textAlign: 'center', opacity: 0.7 }}>
+                <p>Searching nearby election help centers...</p>
+              </div>
+            )}
+
+            {placesError && !loadingPlaces && (
+              <p style={{ fontSize: '0.85rem', color: 'var(--primary)', marginBottom: 'var(--space-md)' }}>
+                {placesError}
+              </p>
+            )}
+
+            {places.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', marginBottom: 'var(--space-lg)' }}>
+                {places.map(place => (
+                  <div key={place.id} className="card" style={{ border: '1px solid var(--primary-light)', padding: 'var(--space-md)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <h5 style={{ margin: 0, color: 'var(--primary)' }}>{place.name}</h5>
+                      <span style={{ fontSize: '0.7rem', background: 'var(--primary-light)', padding: '2px 6px', borderRadius: '4px' }}>
+                        {place.type}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '0.8rem', opacity: 0.8, margin: '8px 0' }}>{place.address}</p>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <button 
+                        className="cta-button" 
+                        style={{ flex: 1, padding: 'var(--space-xs)', fontSize: '0.8rem' }}
+                        onClick={() => window.open(place.mapsUrl, '_blank')}
+                      >
+                        Open in Maps
+                      </button>
+                      <button 
+                        className="cta-button" 
+                        style={{ flex: 1, padding: 'var(--space-xs)', fontSize: '0.8rem', background: 'var(--primary)', color: 'white' }}
+                        onClick={() => handleSelectPlace(place)}
+                      >
+                        Select this place
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <hr style={{ border: 0, borderTop: '1px solid #eee', marginBottom: 'var(--space-lg)' }} />
+
+          <h4 style={{ marginBottom: 'var(--space-sm)' }}>Standard Search Links (Fallback)</h4>
           <div style={{ background: 'var(--primary-light)', padding: 'var(--space-md)', borderRadius: '8px', marginBottom: 'var(--space-md)' }}>
             <p style={{ margin: 0, fontSize: '0.9rem', lineHeight: '1.4' }}>
-              <strong>Important:</strong> Polling booths may not always appear as permanent places on Google Maps. Use these links to find nearby election/government help centers, and verify your final booth from your voter slip or official voter portal.
+              <strong>Note:</strong> If live suggestions aren't available, use these links to find reliable election infrastructure.
             </p>
           </div>
 
@@ -101,3 +197,4 @@ export const BoothFinder: React.FC = () => {
     </div>
   );
 };
+
